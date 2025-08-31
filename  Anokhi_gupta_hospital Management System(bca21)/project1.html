@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+    }
+    .modal {
+        transition: opacity 0.25s ease;
+    }
+    .loading-spinner {
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+</style>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <i class="bi bi-hospital text-teal-600 text-3xl"></i>
+                    <span class="ml-2 text-xl font-semibold text-gray-900">hospital management system</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="toggleView('dashboard')" class="text-gray-600 hover:text-gray-900">Dashboard</button>
+                    <button onclick="toggleView('patients')" class="text-gray-600 hover:text-gray-900">Patients</button>
+                    <button onclick="toggleView('appointments')" class="text-gray-600 hover:text-gray-900">Appointments</button>
+                   
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard View -->
+    <div id="dashboard" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex items-center">
+                    <i class="bi bi-people text-3xl text-teal-600"></i>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold">Total Patients</h3>
+                        <p id="patientCount" class="text-2xl font-bold text-gray-900">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex items-center">
+                    <i class="bi bi-calendar-check text-3xl text-teal-600"></i>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold">Today's Appointments</h3>
+                        <p id="appointmentCount" class="text-2xl font-bold text-gray-900">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex items-center">
+                    <i class="bi bi-heart-pulse text-3xl text-teal-600"></i>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold">Active Cases</h3>
+                        <p id="activeCases" class="text-2xl font-bold text-gray-900">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Patients View -->
+    <div id="patients" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 hidden">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-900">Patients List</h2>
+            <button onclick="showAddPatientModal()" class="bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700">
+                Add New Patient
+            </button>
+        </div>
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Age</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="patientsList" class="bg-white divide-y divide-gray-200"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Appointments View -->
+    <div id="appointments" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 hidden">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-900">Appointments</h2>
+            <button onclick="showAddAppointmentModal()" class="bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700">
+                Schedule Appointment
+            </button>
+        </div>
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Patient</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Time</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="appointmentsList" class="bg-white divide-y divide-gray-200"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add Patient Modal -->
+    <div id="addPatientModal" class="modal hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <h3 class="text-lg font-medium text-gray-900">Add New Patient</h3>
+                <form id="addPatientForm" class="mt-4">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Name</label>
+                        <input type="text" id="patientName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Age</label>
+                        <input type="number" id="patientAge" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Contact</label>
+                        <input type="tel" id="patientContact" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="button" onclick="closeAddPatientModal()" class="mr-2 px-4 py-2 text-gray-500 hover:text-gray-700">Cancel</button>
+                        <button type="submit" class="bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Appointment Modal -->
+    <div id="addAppointmentModal" class="modal hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <h3 class="text-lg font-medium text-gray-900">Schedule Appointment</h3>
+                <form id="addAppointmentForm" class="mt-4">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Patient</label>
+                        <select id="appointmentPatient" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required></select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Date</label>
+                        <input type="date" id="appointmentDate" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Time</label>
+                        <input type="time" id="appointmentTime" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="button" onclick="closeAddAppointmentModal()" class="mr-2 px-4 py-2 text-gray-500 hover:text-gray-700">Cancel</button>
+                        <button type="submit" class="bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700">Schedule</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize local storage
+        if (!localStorage.getItem('patients')) {
+            localStorage.setItem('patients', JSON.stringify([]));
+        }
+        if (!localStorage.getItem('appointments')) {
+            localStorage.setItem('appointments', JSON.stringify([]));
+        }
+
+        // View management
+        function toggleView(viewId) {
+            ['dashboard', 'patients', 'appointments'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(viewId).classList.remove('hidden');
+            updateDashboard();
+            if (viewId === 'patients') loadPatients();
+            if (viewId === 'appointments') loadAppointments();
+        }
+
+        // Patient management
+        function showAddPatientModal() {
+            document.getElementById('addPatientModal').classList.remove('hidden');
+        }
+
+        function closeAddPatientModal() {
+            document.getElementById('addPatientModal').classList.add('hidden');
+            document.getElementById('addPatientForm').reset();
+        }
+
+        document.getElementById('addPatientForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const patient = {
+                id: Date.now(),
+                name: document.getElementById('patientName').value,
+                age: document.getElementById('patientAge').value,
+                contact: document.getElementById('patientContact').value
+            };
+            const patients = JSON.parse(localStorage.getItem('patients'));
+            patients.push(patient);
+            localStorage.setItem('patients', JSON.stringify(patients));
+            closeAddPatientModal();
+            loadPatients();
+            updateDashboard();
+        });
+
+        function loadPatients() {
+            const patients = JSON.parse(localStorage.getItem('patients'));
+            const tbody = document.getElementById('patientsList');
+            tbody.innerHTML = '';
+            patients.forEach(patient => {
+                const row = `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">${patient.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${patient.name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${patient.age}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${patient.contact}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <button onclick="deletePatient(${patient.id})" class="text-red-600 hover:text-red-900">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+            updatePatientSelect();
+        }
+
+        function deletePatient(id) {
+            let patients = JSON.parse(localStorage.getItem('patients'));
+            patients = patients.filter(patient => patient.id !== id);
+            localStorage.setItem('patients', JSON.stringify(patients));
+            loadPatients();
+            updateDashboard();
+        }
+
+        // Appointment management
+        function showAddAppointmentModal() {
+            document.getElementById('addAppointmentModal').classList.remove('hidden');
+            updatePatientSelect();
+        }
+
+        function closeAddAppointmentModal() {
+            document.getElementById('addAppointmentModal').classList.add('hidden');
+            document.getElementById('addAppointmentForm').reset();
+        }
+
+        function updatePatientSelect() {
+            const patients = JSON.parse(localStorage.getItem('patients'));
+            const select = document.getElementById('appointmentPatient');
+            select.innerHTML = '<option value="">Select Patient</option>';
+            patients.forEach(patient => {
+                select.innerHTML += `<option value="${patient.id}">${patient.name}</option>`;
+            });
+        }
+
+        document.getElementById('addAppointmentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const appointment = {
+                id: Date.now(),
+                patientId: document.getElementById('appointmentPatient').value,
+                date: document.getElementById('appointmentDate').value,
+                time: document.getElementById('appointmentTime').value,
+                status: 'Scheduled'
+            };
+            const appointments = JSON.parse(localStorage.getItem('appointments'));
+            appointments.push(appointment);
+            localStorage.setItem('appointments', JSON.stringify(appointments));
+            closeAddAppointmentModal();
+            loadAppointments();
+            updateDashboard();
+        });
+
+        function loadAppointments() {
+            const appointments = JSON.parse(localStorage.getItem('appointments'));
+            const patients = JSON.parse(localStorage.getItem('patients'));
+            const tbody = document.getElementById('appointmentsList');
+            tbody.innerHTML = '';
+            appointments.forEach(appointment => {
+                const patient = patients.find(p => p.id == appointment.patientId);
+                if (patient) {
+                    const row = `
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">${patient.name}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">${appointment.date}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">${appointment.time}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    ${appointment.status}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <button onclick="deleteAppointment(${appointment.id})" class="text-red-600 hover:text-red-900">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                }
+            });
+        }
+
+        function deleteAppointment(id) {
+            let appointments = JSON.parse(localStorage.getItem('appointments'));
+            appointments = appointments.filter(appointment => appointment.id !== id);
+            localStorage.setItem('appointments', JSON.stringify(appointments));
+            loadAppointments();
+            updateDashboard();
+        }
+
+        // Dashboard updates
+        function updateDashboard() {
+            const patients = JSON.parse(localStorage.getItem('patients'));
+            const appointments = JSON.parse(localStorage.getItem('appointments'));
+            document.getElementById('patientCount').textContent = patients.length;
+            
+            const today = new Date().toISOString().split('T')[0];
+            const todayAppointments = appointments.filter(a => a.date === today);
+            document.getElementById('appointmentCount').textContent = todayAppointments.length;
+            
+            const activeAppointments = appointments.filter(a => 
+                new Date(`${a.date} ${a.time}`) >= new Date() && a.status === 'Scheduled'
+            );
+            document.getElementById('activeCases').textContent = activeAppointments.length;
+        }
+
+        // Initial load
+        toggleView('dashboard');
+    </script>
+</body>
+</html>
